@@ -1,0 +1,37 @@
+    - name: Check if npm is installed
+      command: "which npm"
+      register: npmExistCode
+
+    - name: Check if nginx is installed
+      command: "which nginx"
+      register: nginxExistCode
+
+    - name: Installing Node
+      block:
+        - name: Download node rpm
+          get_url:
+            url: https://rpm.nodesource.com/setup_10.x
+            dest: /tmp/
+            mode: 0744
+
+        - name: execute node rpm
+          shell: /tmp/setup_10.x
+
+        - name: remove node rpm
+          file: 
+            path: /tmp/setup_10.x
+            state: absent
+
+        - name: Install nodeJS
+          yum:
+            name: nodejs
+            state: present
+      when: npmExistCode.rc == 1
+
+    - name: Installing Nginx
+      block:
+        - name: Install nginx
+          yum:
+            name: nginx
+            state: present
+      when: nginxExistCode.rc != 0

@@ -1,0 +1,7 @@
+---
+ansible_ssh_user: user1
+ansible_ssh_password: tpstps
+ansible_become_user: root
+ansible_become_password: tpstps
+ansible_remote_user: root
+ansible_remote_password: tpstps

@@ -1,0 +1,42 @@
+    - name: Setting Inital Dependencies
+      set_fact: 
+        dependencies:
+          - wget
+          - gcc
+          - openssl-devel
+          - bzip2-devel
+          - libffi-devel
+          - gcc-c++ 
+          - python
+          - make
+          - git
+          - mcrypt
+
+    - name: Install all required Inital Dependencies
+      yum: 
+        name: "{{ item }}"
+        state: installed
+      loop: "{{ dependencies }}"
+
+    - name: EPEL repo Installation
+      block:
+        - name: 1.Check if EPEL repo is already configured.
+          stat:
+            path: /etc/yum.repos.d/epel.repo
+          register: epel_repofile_result
+
+        - name: 2.Install EPEL repo.
+          yum:
+            name: https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-7-12.noarch.rpm
+            state: present
+          register: result
+          when: not epel_repofile_result.stat.exists
+
+        - name: 3.Import EPEL GPG key.
+          rpm_key:
+            key: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
+            state: present
+          when: not epel_repofile_result.stat.exists
+      always:
+        - debug:
+            msg: "EPEL repo Installation Finished"

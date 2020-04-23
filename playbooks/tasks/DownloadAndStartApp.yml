@@ -1,0 +1,26 @@
+    - name: Cloning Hello World Git Repository
+      git:
+        repo: git@github.com:fhinkel/nodejs-hello-world.git
+        dest: "{{ansible_env.HOME}}/helloWorld"
+        update: yes
+        accept_hostkey: no
+      register: git_finished
+
+    - name: Executing npm install
+      npm: 
+        path: "{{ansible_env.HOME}}/helloWorld/nodejs-hello-world"
+      register: npm_finished
+      when: git_finished.changed
+
+    - name: Stop the application
+      command: pm2 stop app
+      args:
+        chdir: "{{ansible_env.HOME}}/helloWorld/nodejs-hello-world"
+      ignore_errors: yes
+
+    - name: Start the application
+      command: pm2 start index.js --name app
+      args:
+        chdir: "{{ansible_env.HOME}}/helloWorld/nodejs-hello-world"
+      ignore_errors: yes
+      when: npm_finished.changed

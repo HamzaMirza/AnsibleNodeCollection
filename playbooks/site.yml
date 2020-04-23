@@ -1,0 +1,11 @@
+- name: Deploy first nodejs application
+  hosts: webservers
+  become: yes
+  become_method: su
+  become_user: "{{ansible_user}}"
+  remote_user: "{{ansible_remote_user}}"
+  tasks:  
+    - include: tasks/installInitialDependencies.yml       
+    - include: tasks/installNpmDependencies.yml
+    - include: tasks/installPm2Dependencies.yml
+    - include: tasks/DownloadAndStartApp.yml
